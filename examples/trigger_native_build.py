@@ -13,7 +13,9 @@ from capawesome_cloud import CapawesomeCloud, JobTimeoutError
 
 def main(app_id: str) -> None:
     with CapawesomeCloud() as client:
-        build = client.apps.builds.create(app_id, platform="android")
+        # Builds need a source: a connected Git repo (pass git_ref) or an
+        # uploaded build source (pass app_build_source_id).
+        build = client.apps.builds.create(app_id, platform="android", git_ref="main")
         print(f"Started build {build.number_as_string} (job {build.job_id})")
 
         if not build.job_id:
