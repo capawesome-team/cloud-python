@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+from email.utils import format_datetime
+
 import httpx
 import pytest
 import respx
@@ -11,6 +14,7 @@ from capawesome_cloud import (
     NotFoundError,
 )
 from capawesome_cloud._http import DEFAULT_BASE_URL as BASE_URL
+from capawesome_cloud._http import _parse_retry_after
 
 
 @respx.mock
@@ -55,3 +59,26 @@ def test_gives_up_after_max_retries() -> None:
     with pytest.raises(InternalServerError):
         client.apps.list_page()
     assert route.call_count == 2  # initial + 1 retry
+
+
+def test_parse_retry_after_seconds() -> None:
+    assert _parse_retry_after("5") == 5.0
+    assert _parse_retry_after(" 5 ") == 5.0
+    # Negative seconds are clamped to zero.
+    assert _parse_retry_after("-3") == 0.0
+
+
+def test_parse_retry_after_http_date() -> None:
+    future = datetime.now(timezone.utc) + timedelta(seconds=30)
+    delay = _parse_retry_after(format_datetime(future))
+    assert delay is not None
+    assert 25 <= delay <= 31
+    # A date in the past clamps to zero rather than going negative.
+    past = datetime.now(timezone.utc) - timedelta(seconds=30)
+    assert _parse_retry_after(format_datetime(past)) == 0.0
+
+
+def test_parse_retry_after_invalid() -> None:
+    assert _parse_retry_after(None) is None
+    assert _parse_retry_after("") is None
+    assert _parse_retry_after("not-a-date") is None

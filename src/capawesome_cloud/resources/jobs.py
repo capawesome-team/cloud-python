@@ -78,6 +78,10 @@ class JobsResource(BaseResource):
         Raises :class:`JobTimeoutError` if ``timeout`` seconds elapse first.
         Pass ``timeout=None`` to wait indefinitely.
         """
+        if poll_interval <= 0:
+            raise ValueError("poll_interval must be > 0")
+        if timeout is not None and timeout < 0:
+            raise ValueError("timeout must be >= 0 or None")
         deadline = None if timeout is None else time.monotonic() + timeout
         while True:
             job = self.get(job_id)

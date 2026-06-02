@@ -10,6 +10,8 @@ Wraps an :class:`httpx.Client` and adds:
 from __future__ import annotations
 
 import time
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any, Mapping, Optional
 
 import httpx
@@ -151,9 +153,24 @@ def _drop_none(mapping: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _parse_retry_after(value: Optional[str]) -> Optional[float]:
+    """Parse a ``Retry-After`` header value into a delay in seconds.
+
+    Per RFC 9110 the value is either a number of seconds or an HTTP-date.
+    """
     if not value:
         return None
+    value = value.strip()
     try:
-        return float(value)
+        return max(0.0, float(value))
     except ValueError:
+        pass
+    try:
+        retry_at = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
         return None
+    if retry_at is None:
+        return None
+    if retry_at.tzinfo is None:
+        retry_at = retry_at.replace(tzinfo=timezone.utc)
+    delay = (retry_at - datetime.now(timezone.utc)).total_seconds()
+    return max(0.0, delay)

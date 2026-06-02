@@ -7,6 +7,7 @@ requested ``page_size`` (or an empty page) marks the end.
 
 from __future__ import annotations
 
+from collections import deque
 from typing import Any, Callable, Iterator, TypeVar
 
 from .models import CapawesomeModel
@@ -24,7 +25,7 @@ class Paginator(Iterator[T]):
 
     Iterate it directly to transparently page through the full result set::
 
-        for channel in client.channels.list(app_id="..."):
+        for channel in client.apps.channels.list(app_id="..."):
             ...
     """
 
@@ -42,7 +43,7 @@ class Paginator(Iterator[T]):
         self._model = model
         self._page_size = page_size
         self._offset = start_offset
-        self._buffer: list[Any] = []
+        self._buffer: deque[Any] = deque()
         self._exhausted = False
 
     def __iter__(self) -> Paginator[T]:
@@ -53,7 +54,7 @@ class Paginator(Iterator[T]):
             if self._exhausted:
                 raise StopIteration
             self._load_next_page()
-        item = self._buffer.pop(0)
+        item = self._buffer.popleft()
         return self._model.model_validate(item)
 
     def _load_next_page(self) -> None:
