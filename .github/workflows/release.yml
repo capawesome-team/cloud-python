@@ -1,0 +1,77 @@
+name: Release
+
+# Publishes the package to (Test)PyPI via Trusted Publishing (OIDC) — no API
+# tokens are stored. Run manually and pick the target index: publish to
+# `testpypi` first, verify, then run again with `pypi`.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Package index to publish to
+        required: true
+        type: choice
+        default: testpypi
+        options:
+          - testpypi
+          - pypi
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build distributions
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - name: Check distributions
+        run: |
+          python -m pip install --upgrade twine
+          python -m twine check dist/*
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    if: ${{ inputs.target == 'testpypi' }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: Publish to PyPI
+    if: ${{ inputs.target == 'pypi' }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
