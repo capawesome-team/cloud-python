@@ -7,17 +7,8 @@ from ._version import __version__
 from .client import CapawesomeCloud
 from .exceptions import (
     APIConnectionError,
-    APIStatusError,
     APITimeoutError,
-    AuthenticationError,
-    BadRequestError,
     CapawesomeCloudError,
-    ConflictError,
-    InternalServerError,
-    NotFoundError,
-    PermissionDeniedError,
-    RateLimitError,
-    UnprocessableEntityError,
 )
 from .models import (
     App,
@@ -46,15 +37,6 @@ __all__ = [
     "CapawesomeCloudError",
     "APIConnectionError",
     "APITimeoutError",
-    "APIStatusError",
-    "BadRequestError",
-    "AuthenticationError",
-    "PermissionDeniedError",
-    "NotFoundError",
-    "ConflictError",
-    "UnprocessableEntityError",
-    "RateLimitError",
-    "InternalServerError",
     "JobTimeoutError",
     # Models
     "CapawesomeModel",

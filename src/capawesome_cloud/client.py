@@ -17,7 +17,9 @@ from ._http import (
 from .exceptions import CapawesomeCloudError
 from .resources import AppsResource, JobsResource
 
-ENV_TOKEN = "CAPAWESOME_CLOUD_TOKEN"
+# Token environment variables, in order of precedence. CAPAWESOME_TOKEN is
+# accepted for consistency with the Capawesome CLI.
+ENV_TOKENS = ("CAPAWESOME_CLOUD_TOKEN", "CAPAWESOME_TOKEN")
 
 
 class CapawesomeCloud:
@@ -25,7 +27,8 @@ class CapawesomeCloud:
 
     Create an API token in the Capawesome Cloud Console
     (https://console.cloud.capawesome.io/settings/tokens) and pass it as
-    ``token`` or via the ``CAPAWESOME_CLOUD_TOKEN`` environment variable.
+    ``token`` or via the ``CAPAWESOME_CLOUD_TOKEN`` (or ``CAPAWESOME_TOKEN``)
+    environment variable.
 
     Example::
 
@@ -46,11 +49,18 @@ class CapawesomeCloud:
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         http_client: Optional[httpx.Client] = None,
     ) -> None:
-        resolved_token = token or os.environ.get(ENV_TOKEN)
+        resolved_token = token
+        for env_name in ENV_TOKENS:
+            if resolved_token:
+                break
+            resolved_token = os.environ.get(env_name)
+        # Trim surrounding whitespace/newlines (common with secrets piped from
+        # files or CI) so they don't break the Authorization header.
+        resolved_token = (resolved_token or "").strip()
         if not resolved_token:
             raise CapawesomeCloudError(
                 "No API token provided. Pass token=... or set the "
-                f"{ENV_TOKEN} environment variable."
+                f"{ENV_TOKENS[0]} environment variable."
             )
 
         self._http = HttpClient(

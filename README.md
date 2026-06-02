@@ -25,7 +25,7 @@ pip install capawesome-cloud
 
 ## Getting started
 
-Create an API token in the [Capawesome Cloud Console](https://console.cloud.capawesome.io/settings/tokens) and pass it to the client (or set the `CAPAWESOME_CLOUD_TOKEN` environment variable):
+Create an API token in the [Capawesome Cloud Console](https://console.cloud.capawesome.io/settings/tokens) and pass it to the client (or set the `CAPAWESOME_CLOUD_TOKEN` environment variable, with `CAPAWESOME_TOKEN` accepted as a fallback):
 
 ```python
 from capawesome_cloud import CapawesomeCloud
@@ -50,7 +50,7 @@ with CapawesomeCloud(token="cap_...") as client:
 | `token`          | `str`           | `CAPAWESOME_CLOUD_TOKEN` env var  | API token used to authenticate.                            |
 | `base_url`       | `str`           | `https://api.cloud.capawesome.io` | Base URL of the API (for self-hosting/testing).            |
 | `timeout`        | `float`         | `30.0`                            | Request timeout in seconds.                                |
-| `max_retries`    | `int`           | `2`                               | Retries for `429` / `5xx` responses (exponential backoff). |
+| `max_retries`    | `int`           | `2`                               | Retries with exponential backoff. `429` is retried for any request; network/`5xx` failures are retried only for idempotent methods (GET/PUT/DELETE), never `POST`/`PATCH`. |
 | `backoff_factor` | `float`         | `0.5`                             | Base delay for the retry backoff.                          |
 | `http_client`    | `httpx.Client`  | `None`                            | Bring your own pre-configured `httpx.Client`.              |
 
@@ -218,33 +218,23 @@ client.apps.devices.update(app_id, device_id, forced_app_channel_id=None)
 
 ## Error handling
 
-Any non-2xx response is raised as a `CapawesomeCloudError`. HTTP errors map to specific subclasses so you can catch exactly what you need:
+Any non-2xx response is raised as a `CapawesomeCloudError`, carrying the HTTP `status`, the `message` from the API, and the raw `body`:
 
 ```python
-from capawesome_cloud import CapawesomeCloud, NotFoundError
+from capawesome_cloud import CapawesomeCloud, CapawesomeCloudError
 
 client = CapawesomeCloud(token="cap_...")
 
 try:
     client.apps.get("unknown")
-except NotFoundError as error:
-    print(error.status_code)  # 404
+except CapawesomeCloudError as error:
+    print(error.status)       # 404
+    print(error.status_text)  # "Not Found"
     print(error.message)      # "App not found."
     print(error.body)         # {"message": "App not found."}
 ```
 
-| Status | Exception                  |
-| ------ | -------------------------- |
-| 400    | `BadRequestError`          |
-| 401    | `AuthenticationError`      |
-| 403    | `PermissionDeniedError`    |
-| 404    | `NotFoundError`            |
-| 409    | `ConflictError`            |
-| 422    | `UnprocessableEntityError` |
-| 429    | `RateLimitError`           |
-| 5xx    | `InternalServerError`      |
-
-All of the above derive from `APIStatusError`, which in turn derives from `CapawesomeCloudError`. Network failures raise `APIConnectionError` / `APITimeoutError`.
+Network failures raise `APIConnectionError` / `APITimeoutError`, which also derive from `CapawesomeCloudError` — so a single `except CapawesomeCloudError` catches every error the SDK can raise. For those, `status` is `None`.
 
 ## Development
 

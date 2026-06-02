@@ -28,7 +28,14 @@ DEFAULT_TIMEOUT = 30.0
 DEFAULT_MAX_RETRIES = 2
 DEFAULT_BACKOFF_FACTOR = 0.5
 
-_RETRY_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
+# Statuses retried for any request method (the server rejected the request
+# before processing it, so a retry cannot duplicate side effects).
+_RETRY_STATUS_ALWAYS = frozenset({429})
+# Statuses retried only for idempotent methods, since a 5xx may mean the request
+# was already (partially) processed -- retrying a POST could duplicate it.
+_RETRY_STATUS_IDEMPOTENT = frozenset({500, 502, 503, 504})
+# Methods that are safe to retry on network/timeout/5xx failures.
+_IDEMPOTENT_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "PUT", "DELETE"})
 
 # A small JSON-ish type. Responses are intentionally loosely typed because the
 # API does not publish response schemas.
@@ -74,8 +81,15 @@ class HttpClient:
         files: Optional[Mapping[str, Any]] = None,
         data: Optional[Mapping[str, Any]] = None,
     ) -> httpx.Response:
-        """Send a request, retrying transient failures, and validate the status."""
+        """Send a request, retrying transient failures, and validate the status.
+
+        Network/timeout failures and ``5xx`` responses are only retried for
+        idempotent methods (a ``POST`` may have already been processed, so
+        retrying it could duplicate side effects). ``429`` is retried for any
+        method, since the request was rejected before processing.
+        """
         clean_params = _drop_none(params) if params else None
+        idempotent = method.upper() in _IDEMPOTENT_METHODS
         attempt = 0
         while True:
             try:
@@ -88,19 +102,21 @@ class HttpClient:
                     data=data,
                 )
             except httpx.TimeoutException as exc:
-                if attempt < self._max_retries:
+                if idempotent and attempt < self._max_retries:
                     self._sleep(attempt, None)
                     attempt += 1
                     continue
                 raise APITimeoutError(request=exc.request) from exc
             except httpx.TransportError as exc:
-                if attempt < self._max_retries:
+                if idempotent and attempt < self._max_retries:
                     self._sleep(attempt, None)
                     attempt += 1
                     continue
                 raise APIConnectionError(str(exc), request=exc.request) from exc
 
-            if response.status_code in _RETRY_STATUS_CODES and attempt < self._max_retries:
+            if attempt < self._max_retries and self._should_retry_status(
+                response.status_code, idempotent
+            ):
                 self._sleep(attempt, response)
                 attempt += 1
                 continue
@@ -137,6 +153,12 @@ class HttpClient:
         self.close()
 
     # -- internals ----------------------------------------------------------
+
+    @staticmethod
+    def _should_retry_status(status_code: int, idempotent: bool) -> bool:
+        if status_code in _RETRY_STATUS_ALWAYS:
+            return True
+        return idempotent and status_code in _RETRY_STATUS_IDEMPOTENT
 
     def _sleep(self, attempt: int, response: Optional[httpx.Response]) -> None:
         delay = self._backoff_factor * (2**attempt)
