@@ -1,5 +1,9 @@
 # capawesome-cloud
 
+[![PyPI version](https://img.shields.io/pypi/v/capawesome-cloud)](https://pypi.org/project/capawesome-cloud/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/capawesome-cloud)](https://pypi.org/project/capawesome-cloud/)
+[![license](https://img.shields.io/pypi/l/capawesome-cloud)](https://github.com/capawesome-team/cloud-python/blob/main/LICENSE)
+
 Python SDK for the [Capawesome Cloud](https://capawesome.io/cloud/) API.
 
 It provides a fully typed, synchronous interface for managing apps, live update channels and deployments, native builds, app store destinations, and more.
