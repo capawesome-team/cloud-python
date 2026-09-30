@@ -28,12 +28,13 @@ class EnvironmentsResource(BaseResource):
         self,
         app_id: str,
         *,
+        name: Optional[str] = None,
         query: Optional[str] = None,
         relations: Optional[str] = None,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> Paginator[AppEnvironment]:
         """Iterate over all environments of an app."""
-        params = build_params({"query": query, "relations": relations})
+        params = build_params({"name": name, "query": query, "relations": relations})
         return self._paginate(
             self._base(app_id), AppEnvironment, params=params, page_size=page_size
         )
@@ -44,12 +45,19 @@ class EnvironmentsResource(BaseResource):
         *,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        name: Optional[str] = None,
         query: Optional[str] = None,
         relations: Optional[str] = None,
     ) -> List[AppEnvironment]:
         """Fetch a single page of environments."""
         params = build_params(
-            {"limit": limit, "offset": offset, "query": query, "relations": relations}
+            {
+                "limit": limit,
+                "offset": offset,
+                "name": name,
+                "query": query,
+                "relations": relations,
+            }
         )
         return self._list_page(self._base(app_id), AppEnvironment, params=params)
 
@@ -66,6 +74,14 @@ class EnvironmentsResource(BaseResource):
         """Update an environment."""
         return self._request_model(
             "PATCH", f"{self._base(app_id)}/{environment_id}", AppEnvironment, json={"name": name}
+        )
+
+    def delete(
+        self, app_id: str, environment_id: Optional[str] = None, *, name: Optional[str] = None
+    ) -> None:
+        """Delete an environment by id or name. The id takes precedence."""
+        self._delete_by_id_or_name(
+            self._base(app_id), id=environment_id, name=name, resource="environment"
         )
 
 

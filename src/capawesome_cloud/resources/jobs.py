@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import time
-from typing import List, Optional
+from typing import List, Optional, Sequence, Union
 
 from ..exceptions import CapawesomeCloudError
-from ..models import Job
+from ..models import Job, JobFailureSummary
 from ..pagination import DEFAULT_PAGE_SIZE, Paginator
 from ._base import BaseResource, build_params
 
@@ -25,13 +25,17 @@ class JobsResource(BaseResource):
         self,
         *,
         organization_id: str,
-        status: Optional[str] = None,
+        status: Union[str, Sequence[str], None] = None,
         relations: Optional[str] = None,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> Paginator[Job]:
         """Iterate over all jobs of an organization."""
         params = build_params(
-            {"organizationId": organization_id, "status": status, "relations": relations}
+            {
+                "organizationId": organization_id,
+                "status": _join_statuses(status),
+                "relations": relations,
+            }
         )
         return self._paginate(self._path, Job, params=params, page_size=page_size)
 
@@ -41,7 +45,7 @@ class JobsResource(BaseResource):
         organization_id: str,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        status: Optional[str] = None,
+        status: Union[str, Sequence[str], None] = None,
         relations: Optional[str] = None,
     ) -> List[Job]:
         """Fetch a single page of jobs."""
@@ -50,7 +54,7 @@ class JobsResource(BaseResource):
                 "organizationId": organization_id,
                 "limit": limit,
                 "offset": offset,
-                "status": status,
+                "status": _join_statuses(status),
                 "relations": relations,
             }
         )
@@ -65,6 +69,21 @@ class JobsResource(BaseResource):
         """Return the job's logs as text."""
         response = self._http.request("GET", f"{self._path}/{job_id}/logs")
         return response.text
+
+    def get_failure_summary(self, job_id: str) -> JobFailureSummary:
+        """Return a summary explaining why a failed job failed.
+
+        The summary is generated on the first request and cached afterwards.
+        """
+        return self._request_model(
+            "POST", f"{self._path}/{job_id}/failure-summary", JobFailureSummary
+        )
+
+    def cancel(self, job_id: str) -> Job:
+        """Cancel a job that has not finished yet."""
+        return self._request_model(
+            "PATCH", f"{self._path}/{job_id}", Job, json={"status": "canceled"}
+        )
 
     def wait(
         self,
@@ -93,3 +112,9 @@ class JobsResource(BaseResource):
                     f"(last status: {job.status})."
                 )
             time.sleep(poll_interval)
+
+
+def _join_statuses(status: Union[str, Sequence[str], None]) -> Optional[str]:
+    if status is None or isinstance(status, str):
+        return status
+    return ",".join(status)

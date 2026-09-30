@@ -6,6 +6,7 @@ from .build_sources import BuildSourcesResource
 from .builds import BuildArtifactsResource, BuildsResource
 from .certificates import CertificatesResource
 from .channels import ChannelsResource
+from .configurations import ConfigurationsResource
 from .deployments import DeploymentsResource
 from .destinations import DestinationsResource
 from .devices import DevicesResource
@@ -15,6 +16,8 @@ from .environments import (
     EnvironmentVariablesResource,
 )
 from .jobs import JobsResource
+from .repository import RepositoryResource
+from .users import UsersResource
 from .webhooks import WebhooksResource
 
 __all__ = [
@@ -25,6 +28,7 @@ __all__ = [
     "BuildsResource",
     "CertificatesResource",
     "ChannelsResource",
+    "ConfigurationsResource",
     "DeploymentsResource",
     "DestinationsResource",
     "DevicesResource",
@@ -32,5 +36,7 @@ __all__ = [
     "EnvironmentVariablesResource",
     "EnvironmentsResource",
     "JobsResource",
+    "RepositoryResource",
+    "UsersResource",
     "WebhooksResource",
 ]

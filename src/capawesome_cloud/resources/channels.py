@@ -85,9 +85,11 @@ class ChannelsResource(BaseResource):
             "PATCH", f"{self._base(app_id)}/{channel_id}", AppChannel, json=body
         )
 
-    def delete(self, app_id: str, channel_id: str) -> None:
-        """Delete a channel."""
-        self._request_none("DELETE", f"{self._base(app_id)}/{channel_id}")
+    def delete(
+        self, app_id: str, channel_id: Optional[str] = None, *, name: Optional[str] = None
+    ) -> None:
+        """Delete a channel by id or name. The id takes precedence."""
+        self._delete_by_id_or_name(self._base(app_id), id=channel_id, name=name, resource="channel")
 
     def pause(self, app_id: str, channel_id: str) -> None:
         """Pause update delivery on a channel."""

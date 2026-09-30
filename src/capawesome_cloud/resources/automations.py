@@ -19,9 +19,15 @@ _WRITE_FIELDS = {
     "build_stack": "buildStack",
     "enabled": "enabled",
     "app_certificate_id": "appCertificateId",
+    "app_certificate_name": "appCertificateName",
     "app_channel_id": "appChannelId",
+    "app_channel_name": "appChannelName",
+    "app_configuration_id": "appConfigurationId",
+    "app_configuration_name": "appConfigurationName",
     "app_destination_id": "appDestinationId",
+    "app_destination_name": "appDestinationName",
     "app_environment_id": "appEnvironmentId",
+    "app_environment_name": "appEnvironmentName",
 }
 
 
@@ -36,7 +42,8 @@ class AutomationsResource(BaseResource):
 
         ``name`` and ``trigger_type`` (``branch`` or ``tag``) are required. Provide
         further fields by their snake_case names (e.g. ``platform``,
-        ``trigger_pattern``, ``app_channel_id``).
+        ``trigger_pattern``, ``app_channel_id``). Resources can also be referenced
+        by name (e.g. ``app_channel_name``); ids take precedence.
         """
         body = _map_write_fields({"name": name, "trigger_type": trigger_type, **fields})
         return self._request_model("POST", self._base(app_id), AppAutomation, json=body)
@@ -45,13 +52,16 @@ class AutomationsResource(BaseResource):
         self,
         app_id: str,
         *,
+        name: Optional[str] = None,
         platform: Optional[str] = None,
         query: Optional[str] = None,
         relations: Optional[str] = None,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> Paginator[AppAutomation]:
         """Iterate over all automations of an app."""
-        params = build_params({"platform": platform, "query": query, "relations": relations})
+        params = build_params(
+            {"name": name, "platform": platform, "query": query, "relations": relations}
+        )
         return self._paginate(self._base(app_id), AppAutomation, params=params, page_size=page_size)
 
     def list_page(
@@ -60,6 +70,7 @@ class AutomationsResource(BaseResource):
         *,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        name: Optional[str] = None,
         platform: Optional[str] = None,
         query: Optional[str] = None,
         relations: Optional[str] = None,
@@ -69,6 +80,7 @@ class AutomationsResource(BaseResource):
             {
                 "limit": limit,
                 "offset": offset,
+                "name": name,
                 "platform": platform,
                 "query": query,
                 "relations": relations,

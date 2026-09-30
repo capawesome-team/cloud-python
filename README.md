@@ -88,11 +88,23 @@ client.apps.channels.resume(app_id, channel.id)
 Promote a build to a channel (live updates) or a destination (app store publishing):
 
 ```python
-deployment = client.apps.deployments.create(
+# Roll out a live update to half of the devices on a channel
+client.apps.deployments.create(
     app_id,
     app_build_id=app_build_id,
     app_channel_name="production",
     rollout_percentage=0.5,
+)
+
+# Publish a native build to an app store with localized release notes
+client.apps.deployments.create(
+    app_id,
+    app_build_id=app_build_id,
+    app_destination_name="Google Play",
+    release_notes={
+        "default": "Bug fixes and performance improvements.",
+        "de-DE": "Fehlerbehebungen und Leistungsverbesserungen.",
+    },
 )
 ```
 
@@ -106,6 +118,10 @@ job = client.jobs.wait(build.job_id)
 print(job.status)
 
 logs = client.jobs.logs(job.id)
+
+# Explain a failure
+if job.status == "failed":
+    print(client.jobs.get_failure_summary(job.id).summary)
 ```
 
 #### Build artifacts
@@ -218,7 +234,10 @@ client.apps.devices.update(app_id, device_id, forced_app_channel_id=None)
 | `client.apps.automations`           | Manage build automations.                           |
 | `client.apps.devices`               | Manage registered devices.                          |
 | `client.apps.webhooks`              | Manage app webhooks.                                |
+| `client.apps.configurations`        | Manage native app configurations.                   |
+| `client.apps.repository`            | Link an app to a Git repository.                    |
 | `client.jobs`                       | Inspect background jobs and their logs.             |
+| `client.users`                      | Access the authenticated user.                      |
 
 ## Error handling
 

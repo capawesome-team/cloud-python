@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, Union
+from typing import List, Mapping, Optional, Union
 
 from .._types import NOT_GIVEN, NotGiven
 from ..models import AppDeployment
@@ -24,8 +24,15 @@ class DeploymentsResource(BaseResource):
         app_destination_id: Union[str, None, NotGiven] = NOT_GIVEN,
         app_destination_name: Union[str, None, NotGiven] = NOT_GIVEN,
         rollout_percentage: Union[float, None, NotGiven] = NOT_GIVEN,
+        release_notes: Union[Mapping[str, str], NotGiven] = NOT_GIVEN,
     ) -> AppDeployment:
-        """Create a deployment. Target a live-update channel and/or a destination."""
+        """Create a deployment. Target a live-update channel and/or a destination.
+
+        ``release_notes`` are only supported for destination deployments. They
+        require a ``default`` entry; other keys are locales (e.g. ``de-DE``) with
+        translations. Google Play and Huawei AppGallery allow 500 characters per
+        entry, other destinations 4000.
+        """
         body = build_body(
             {
                 "appBuildId": app_build_id,
@@ -34,6 +41,7 @@ class DeploymentsResource(BaseResource):
                 "appDestinationId": app_destination_id,
                 "appDestinationName": app_destination_name,
                 "rolloutPercentage": rollout_percentage,
+                "releaseNotes": release_notes,
             }
         )
         return self._request_model("POST", self._base(app_id), AppDeployment, json=body)
