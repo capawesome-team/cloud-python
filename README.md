@@ -306,7 +306,7 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-Commit messages follow [Conventional Commits](https://www.conventionalcommits.org), enforced by [Commitizen](https://commitizen-tools.github.io/commitizen/) — run `cz commit` for a guided prompt. Common commands during development:
+Common commands during development:
 
 | Command                                    | Description                            |
 | ------------------------------------------ | -------------------------------------- |
@@ -315,7 +315,6 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 | `ruff format src tests examples`           | Auto-format the code.                  |
 | `ruff format --check src tests examples`   | Check formatting without writing.      |
 | `mypy`                                     | Type-check the package.                |
-| `cz commit`                                | Create a Conventional Commit.          |
 
 ### Testing
 
@@ -328,12 +327,9 @@ pytest --cov=capawesome_cloud   # run with a coverage report
 
 ### Publishing
 
-Releases are driven by [Commitizen](https://commitizen-tools.github.io/commitizen/), which derives the next version and changelog entries from [Conventional Commits](https://www.conventionalcommits.org).
+Releases are automated with [Release Please](https://github.com/googleapis/release-please), which derives the next version and changelog entries from [Conventional Commits](https://www.conventionalcommits.org).
 
-1. Make sure `main` is up to date and CI is green.
-2. Run `cz bump`. This bumps the version (in `[tool.commitizen]` and `src/capawesome_cloud/_version.py`), regenerates `CHANGELOG.md`, and creates a release commit plus a matching `vX.Y.Z` tag — all locally, nothing is pushed yet. Pass `--dry-run` first if you want to preview the result.
-3. Review the generated commit and changelog, then push everything: `git push --follow-tags origin main`.
-4. Build the distributions with `python -m build`, then publish to PyPI with `python -m twine upload dist/*` (requires `pip install build twine`).
+On every push to `main`, the [Release workflow](./.github/workflows/release.yml) creates or updates a release pull request that bumps the version and updates `CHANGELOG.md`. Merging that pull request creates the git tag and GitHub release, and publishes the package to PyPI.
 
 ## License
 

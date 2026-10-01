@@ -1,38 +1,50 @@
 name: Release
 
-# Publishes the package to (Test)PyPI via Trusted Publishing (OIDC) — no API
-# tokens are stored. Run manually and pick the target index: publish to
-# `testpypi` first, verify, then run again with `pypi`.
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      target:
-        description: Package index to publish to
-        required: true
-        type: choice
-        default: testpypi
-        options:
-          - testpypi
-          - pypi
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  PYTHON_VERSION: '3.12'
 
 jobs:
+  release-please:
+    name: Release Please
+    if: github.repository == 'capawesome-team/cloud-python'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release-please.outputs.release_created }}
+    steps:
+      - name: Create release pull request or GitHub release
+        id: release-please
+        uses: googleapis/release-please-action@v4
+
   build:
     name: Build
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Set up Python
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Build distributions
         run: |
-          python -m pip install --upgrade pip build
+          python -m pip install --upgrade pip build twine
           python -m build
-      - name: Check distributions
-        run: |
-          python -m pip install --upgrade twine
           python -m twine check dist/*
       - name: Upload distributions
         uses: actions/upload-artifact@v7
@@ -40,33 +52,13 @@ jobs:
           name: dist
           path: dist/
 
-  publish-testpypi:
-    name: Publish to TestPyPI
-    if: ${{ inputs.target == 'testpypi' }}
-    needs: build
-    runs-on: ubuntu-latest
-    environment: testpypi
-    permissions:
-      id-token: write
-    steps:
-      - name: Download distributions
-        uses: actions/download-artifact@v8
-        with:
-          name: dist
-          path: dist/
-      - name: Publish
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-
-  publish-pypi:
+  publish:
     name: Publish to PyPI
-    if: ${{ inputs.target == 'pypi' }}
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write
+      id-token: write # Required for PyPI trusted publishing
     steps:
       - name: Download distributions
         uses: actions/download-artifact@v8
