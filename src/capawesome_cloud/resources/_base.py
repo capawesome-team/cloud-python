@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Mapping, Optional, TypeVar
+from typing import Any, List, Mapping, Optional, Sequence, TypeVar
 
 from .._http import HttpClient
 from .._types import NotGiven
@@ -24,6 +24,17 @@ def build_params(values: Mapping[str, Any]) -> dict[str, Any]:
         for key, value in values.items()
         if value is not None and not isinstance(value, NotGiven)
     }
+
+
+def to_list(values: object) -> object:
+    """Convert a sequence to a JSON-serializable list, passing sentinels through.
+
+    Strings are passed through as well, so the API rejects them instead of
+    receiving a list of characters.
+    """
+    if isinstance(values, Sequence) and not isinstance(values, str):
+        return list(values)
+    return values
 
 
 class BaseResource:

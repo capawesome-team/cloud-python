@@ -15,7 +15,7 @@ from ._http import (
     HttpClient,
 )
 from .exceptions import CapawesomeCloudError
-from .resources import AppsResource, JobsResource, UsersResource
+from .resources import AppsResource, JobsResource, OrganizationsResource, UsersResource
 
 # Token environment variables, in order of precedence. CAPAWESOME_TOKEN is
 # accepted for consistency with the Capawesome CLI.
@@ -72,9 +72,10 @@ class CapawesomeCloud:
             http_client=http_client,
         )
 
-        # App-scoped resources are nested under ``apps`` (e.g.
-        # ``client.apps.channels``); ``jobs`` is organization-scoped.
+        # Resources mirror the API paths: ``/v1/apps/{appId}/...`` is nested under
+        # ``apps``, ``/v1/organizations/{organizationId}/...`` under ``organizations``.
         self.apps = AppsResource(self._http)
+        self.organizations = OrganizationsResource(self._http)
         self.jobs = JobsResource(self._http)
         self.users = UsersResource(self._http)
 
