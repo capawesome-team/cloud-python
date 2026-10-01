@@ -53,3 +53,23 @@ def test_get_failure_summary(client: CapawesomeCloud) -> None:
         return_value=httpx.Response(200, json={"summary": "The signing certificate expired."})
     )
     assert client.jobs.get_failure_summary("job1").summary == "The signing certificate expired."
+
+
+@respx.mock
+def test_logs_are_parsed(client: CapawesomeCloud) -> None:
+    respx.get(f"{BASE_URL}/v1/jobs/job1/logs").mock(
+        return_value=httpx.Response(
+            200,
+            json=[
+                {
+                    "jobId": "job1",
+                    "number": 1,
+                    "payload": "Cloning repository",
+                    "timestamp": "2026-10-01T08:00:00Z",
+                }
+            ],
+        )
+    )
+    logs = client.jobs.logs("job1")
+    assert logs[0].number == 1
+    assert logs[0].payload == "Cloning repository"

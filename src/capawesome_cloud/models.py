@@ -41,6 +41,7 @@ __all__ = [
     "AppGitRepository",
     "Job",
     "JobFailureSummary",
+    "JobLog",
     "User",
     "Organization",
     "OrganizationMember",
@@ -225,6 +226,13 @@ class Job(CapawesomeModel):
     app_deployment_id: Optional[str] = None
     finished_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
+
+
+class JobLog(CapawesomeModel):
+    job_id: Optional[str] = None
+    number: Optional[int] = None
+    payload: Optional[str] = None
+    timestamp: Optional[datetime] = None
 
 
 class JobFailureSummary(CapawesomeModel):

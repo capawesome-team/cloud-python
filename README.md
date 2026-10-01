@@ -147,7 +147,8 @@ build = client.apps.builds.create(app_id, platform="ios", git_ref="main")
 job = client.jobs.wait(build.job_id)
 print(job.status)
 
-logs = client.jobs.logs(job.id)
+for log in client.jobs.logs(job.id):
+    print(log.payload)
 
 # Explain a failure
 if job.status == "failed":
