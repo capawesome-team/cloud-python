@@ -6,7 +6,7 @@
 
 Python SDK for the [Capawesome Cloud](https://capawesome.io/cloud/) API.
 
-It provides a fully typed, synchronous interface for managing apps, live update channels and deployments, native builds, app store destinations, and more.
+It provides a fully typed, synchronous interface for managing organizations, apps, live update channels and deployments, native builds, app store destinations, and more.
 
 > **Note:** The Capawesome Cloud API is still in development and may change without notice. Response types intentionally expose only the most relevant properties to minimize breaking changes.
 
@@ -60,7 +60,24 @@ with CapawesomeCloud(token="cap_...") as client:
 
 ## Usage
 
-Resources mirror the API's path hierarchy. App-scoped resources are nested under `client.apps.*`; organization-scoped resources are on the client directly (e.g. `client.jobs`). Every app-scoped method takes `app_id` as its first argument.
+Resources mirror the API's path hierarchy. App-scoped resources are nested under `client.apps.*`, organization-scoped resources under `client.organizations.*`; top-level resources are on the client directly (e.g. `client.jobs`). Every app-scoped method takes `app_id` as its first argument, every organization-scoped method `organization_id`.
+
+### Organizations
+
+```python
+organizations = client.organizations.list()
+organization = client.organizations.get(organization_id)
+members = client.organizations.members.list(organization_id)
+
+# Invite a new member
+client.organizations.invitations.create(
+    organization_id, email="jane@example.com", role="member"
+)
+
+# Group apps and members in a team
+team = client.organizations.teams.create(organization_id, name="Mobile")
+client.organizations.teams.apps.create(organization_id, team.id, app_id=app_id)
+```
 
 ### Apps
 
@@ -106,6 +123,19 @@ client.apps.deployments.create(
         "de-DE": "Fehlerbehebungen und Leistungsverbesserungen.",
     },
 )
+```
+
+### Git repositories
+
+Native builds are created from the repository an app is linked to:
+
+```python
+connection = client.organizations.git_connections.list_page(organization_id, limit=1)[0]
+repositories = client.organizations.git_connections.list_repositories(
+    organization_id, connection.id
+)
+
+client.apps.repository.set(app_id, git_connection_id=connection.id, path=repositories[0].path)
 ```
 
 ### Native builds
@@ -220,24 +250,30 @@ client.apps.devices.update(app_id, device_id, forced_app_channel_id=None)
 
 ## Available resources
 
-| Resource                            | Description                                         |
-| ----------------------------------- | --------------------------------------------------- |
-| `client.apps`                       | Create, read, update, delete and transfer apps.     |
-| `client.apps.channels`              | Manage live update channels (incl. pause/resume).   |
-| `client.apps.deployments`           | Promote builds to channels or destinations.         |
-| `client.apps.builds`                | Trigger and manage native builds.                   |
-| `client.apps.builds.artifacts`      | List and download build artifacts.                  |
-| `client.apps.build_sources`         | Register and download native build sources.         |
-| `client.apps.certificates`          | Manage signing certificates.                        |
-| `client.apps.destinations`          | Manage app store publishing destinations.           |
-| `client.apps.environments`          | Manage environments, secrets and variables.         |
-| `client.apps.automations`           | Manage build automations.                           |
-| `client.apps.devices`               | Manage registered devices.                          |
-| `client.apps.webhooks`              | Manage app webhooks.                                |
-| `client.apps.configurations`        | Manage native app configurations.                   |
-| `client.apps.repository`            | Link an app to a Git repository.                    |
-| `client.jobs`                       | Inspect background jobs and their logs.             |
-| `client.users`                      | Access the authenticated user.                      |
+| Resource                               | Description                                       |
+| -------------------------------------- | ------------------------------------------------- |
+| `client.apps`                          | Create, read, update, delete and transfer apps.   |
+| `client.apps.channels`                 | Manage live update channels (incl. pause/resume). |
+| `client.apps.deployments`              | Promote builds to channels or destinations.       |
+| `client.apps.builds`                   | Trigger and manage native builds.                 |
+| `client.apps.builds.artifacts`         | List and download build artifacts.                |
+| `client.apps.build_sources`            | Register and download native build sources.       |
+| `client.apps.certificates`             | Manage signing certificates.                      |
+| `client.apps.destinations`             | Manage app store publishing destinations.         |
+| `client.apps.environments`             | Manage environments, secrets and variables.       |
+| `client.apps.automations`              | Manage build automations.                         |
+| `client.apps.devices`                  | Manage registered devices.                        |
+| `client.apps.webhooks`                 | Manage app webhooks.                              |
+| `client.apps.configurations`           | Manage native app configurations.                 |
+| `client.apps.repository`               | Link an app to a Git repository.                  |
+| `client.organizations`                 | Create, read and update organizations.            |
+| `client.organizations.members`         | Manage organization members.                      |
+| `client.organizations.invitations`     | Invite users to an organization.                  |
+| `client.organizations.teams`           | Manage teams and their apps and members.          |
+| `client.organizations.license_keys`    | Manage license keys for Insiders packages.        |
+| `client.organizations.git_connections` | Manage Git connections and browse repositories.   |
+| `client.jobs`                          | Inspect background jobs and their logs.           |
+| `client.users`                         | Access the authenticated user.                    |
 
 ## Error handling
 

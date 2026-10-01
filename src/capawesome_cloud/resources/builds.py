@@ -8,7 +8,7 @@ from .._http import HttpClient
 from .._types import NOT_GIVEN, NotGiven
 from ..models import AppBuild, AppBuildArtifact
 from ..pagination import DEFAULT_PAGE_SIZE, Paginator
-from ._base import BaseResource, build_body, build_params
+from ._base import BaseResource, build_body, build_params, to_list
 
 
 class BuildsResource(BaseResource):
@@ -58,8 +58,8 @@ class BuildsResource(BaseResource):
                 "appCertificateId": app_certificate_id,
                 "appCertificateName": app_certificate_name,
                 "appChannelId": app_channel_id,
-                "appChannelIds": _to_list(app_channel_ids),
-                "appChannelNames": _to_list(app_channel_names),
+                "appChannelIds": to_list(app_channel_ids),
+                "appChannelNames": to_list(app_channel_names),
                 "appConfigurationId": app_configuration_id,
                 "appConfigurationName": app_configuration_name,
                 "appDestinationId": app_destination_id,
@@ -209,9 +209,3 @@ class BuildArtifactsResource(BaseResource):
         return self._download(
             f"{self._base(app_id, build_id)}/{artifact_id}/download", params=params
         )
-
-
-def _to_list(values: object) -> object:
-    if isinstance(values, Sequence):
-        return list(values)
-    return values

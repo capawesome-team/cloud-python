@@ -15,8 +15,14 @@ from .environments import (
     EnvironmentsResource,
     EnvironmentVariablesResource,
 )
+from .git_connections import GitConnectionsResource
+from .invitations import InvitationsResource
 from .jobs import JobsResource
+from .license_keys import LicenseKeysResource
+from .members import MembersResource
+from .organizations import OrganizationsResource
 from .repository import RepositoryResource
+from .teams import TeamAppsResource, TeamMembersResource, TeamsResource
 from .users import UsersResource
 from .webhooks import WebhooksResource
 
@@ -35,8 +41,16 @@ __all__ = [
     "EnvironmentSecretsResource",
     "EnvironmentVariablesResource",
     "EnvironmentsResource",
+    "GitConnectionsResource",
+    "InvitationsResource",
     "JobsResource",
+    "LicenseKeysResource",
+    "MembersResource",
+    "OrganizationsResource",
     "RepositoryResource",
+    "TeamAppsResource",
+    "TeamMembersResource",
+    "TeamsResource",
     "UsersResource",
     "WebhooksResource",
 ]

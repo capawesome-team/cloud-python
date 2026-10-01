@@ -8,8 +8,8 @@ fields the API returns are preserved and accessible as attributes, but they are
 notice -- do not rely on them.
 
 App-scoped resources are prefixed with ``App`` (``AppChannel``, ``AppWebhook``,
-...) to mirror the API's entity names and avoid future clashes with
-organization-scoped resources. Field names are exposed in Pythonic
+...) to mirror the API's entity names and avoid clashes with organization-scoped
+resources. Field names are exposed in Pythonic
 ``snake_case`` while the API's ``camelCase`` keys are accepted transparently.
 """
 
@@ -42,6 +42,16 @@ __all__ = [
     "Job",
     "JobFailureSummary",
     "User",
+    "Organization",
+    "OrganizationMember",
+    "OrganizationInvitation",
+    "LicenseKey",
+    "Team",
+    "TeamApp",
+    "TeamMember",
+    "GitConnection",
+    "GitRepository",
+    "GitNamespace",
 ]
 
 
@@ -226,3 +236,82 @@ class User(CapawesomeModel):
     name: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
+class Organization(CapawesomeModel):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class OrganizationMember(CapawesomeModel):
+    role: Optional[str] = None
+    user: Optional[User] = None
+    user_id: Optional[str] = None
+    organization_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class OrganizationInvitation(CapawesomeModel):
+    email: Optional[str] = None
+    role: Optional[str] = None
+    status: Optional[str] = None
+    organization_id: Optional[str] = None
+    expires_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class LicenseKey(CapawesomeModel):
+    name: Optional[str] = None
+    key: Optional[str] = None
+    organization_id: Optional[str] = None
+    expires_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+
+
+class Team(CapawesomeModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    organization_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class TeamApp(CapawesomeModel):
+    team_id: Optional[str] = None
+    app_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+
+class TeamMember(CapawesomeModel):
+    team_id: Optional[str] = None
+    member_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+
+class GitConnection(CapawesomeModel):
+    name: Optional[str] = None
+    provider: Optional[str] = None
+    auth_kind: Optional[str] = None
+    base_url: Optional[str] = None
+    organization_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class GitRepository(CapawesomeModel):
+    name: Optional[str] = None
+    namespace: Optional[str] = None
+    path: Optional[str] = None
+    private: Optional[bool] = None
+    web_url: Optional[str] = None
+    default_branch: Optional[str] = None
+
+
+class GitNamespace(CapawesomeModel):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    kind: Optional[str] = None
