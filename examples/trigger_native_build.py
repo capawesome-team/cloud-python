@@ -29,7 +29,8 @@ def main(app_id: str) -> None:
 
         print(f"Build finished with status: {job.status}")
         if job.status != "succeeded":
-            print(client.jobs.logs(build.job_id))
+            for log in client.jobs.logs(build.job_id):
+                print(log.payload)
             return
 
         for artifact in client.apps.builds.artifacts.list(app_id, build.id):

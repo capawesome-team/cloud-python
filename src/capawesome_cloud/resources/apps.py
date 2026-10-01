@@ -117,7 +117,6 @@ class AppsResource(BaseResource):
         app_channel_id: Union[str, None, NotGiven] = NOT_GIVEN,
         app_environment_id: Union[str, None, NotGiven] = NOT_GIVEN,
         app_channel_discovery_enabled: Union[bool, NotGiven] = NOT_GIVEN,
-        git_repository_url: Union[str, None, NotGiven] = NOT_GIVEN,
         next_app_build_number: Union[int, NotGiven] = NOT_GIVEN,
     ) -> App:
         """Update an app."""
@@ -128,7 +127,6 @@ class AppsResource(BaseResource):
                 "appChannelId": app_channel_id,
                 "appEnvironmentId": app_environment_id,
                 "appChannelDiscoveryEnabled": app_channel_discovery_enabled,
-                "gitRepositoryUrl": git_repository_url,
                 "nextAppBuildNumber": next_app_build_number,
             }
         )

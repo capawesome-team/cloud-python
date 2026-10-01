@@ -6,7 +6,7 @@ import time
 from typing import List, Optional, Sequence, Union
 
 from ..exceptions import CapawesomeCloudError
-from ..models import Job, JobFailureSummary
+from ..models import Job, JobFailureSummary, JobLog
 from ..pagination import DEFAULT_PAGE_SIZE, Paginator
 from ._base import BaseResource, build_params
 
@@ -65,10 +65,9 @@ class JobsResource(BaseResource):
         params = build_params({"relations": relations})
         return self._request_model("GET", f"{self._path}/{job_id}", Job, params=params)
 
-    def logs(self, job_id: str) -> str:
-        """Return the job's logs as text."""
-        response = self._http.request("GET", f"{self._path}/{job_id}/logs")
-        return response.text
+    def logs(self, job_id: str) -> List[JobLog]:
+        """List the log lines of a job."""
+        return self._list_page(f"{self._path}/{job_id}/logs", JobLog)
 
     def get_failure_summary(self, job_id: str) -> JobFailureSummary:
         """Return a summary explaining why a failed job failed.
