@@ -43,7 +43,6 @@ dev = [
     "respx>=0.21",
     "ruff>=0.6",
     "mypy>=1.11",
-    "commitizen>=3.29",
 ]
 
 [tool.hatch.version]
@@ -77,10 +76,3 @@ files = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
-
-[tool.commitizen]
-version = "0.1.0"
-version_files = ["src/capawesome_cloud/_version.py:__version__"]
-tag_format = "v$version"
-update_changelog_on_bump = true
-major_version_zero = true
