@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/capawesome-team/cloud-python/compare/v0.2.0...v0.2.1) (2026-10-01)
+
+
+### Features
+
+* **apps:** add `build_stack` to apps ([#8](https://github.com/capawesome-team/cloud-python/issues/8)) ([25b34a9](https://github.com/capawesome-team/cloud-python/commit/25b34a93a6302bf828ed6c97766a3c709f39ecc4))
+
 ## [0.2.0](https://github.com/capawesome-team/cloud-python/compare/v0.1.0...v0.2.0) (2026-10-01)
 
 
