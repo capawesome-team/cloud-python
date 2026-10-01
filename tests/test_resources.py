@@ -40,6 +40,16 @@ def test_update_with_no_args_sends_empty_body(client: CapawesomeCloud) -> None:
 
 
 @respx.mock
+def test_app_update_sends_build_stack(client: CapawesomeCloud) -> None:
+    route = respx.patch(f"{BASE_URL}/v1/apps/app1").mock(
+        return_value=httpx.Response(200, json={"id": "app1", "buildStack": "macos-tahoe"})
+    )
+    app = client.apps.update("app1", build_stack="macos-tahoe")
+    assert route.calls.last.request.read() == b'{"buildStack":"macos-tahoe"}'
+    assert app.build_stack == "macos-tahoe"
+
+
+@respx.mock
 def test_pause_channel_no_content(client: CapawesomeCloud) -> None:
     route = respx.post(f"{BASE_URL}/v1/apps/app1/channels/ch1/pause").mock(
         return_value=httpx.Response(204)

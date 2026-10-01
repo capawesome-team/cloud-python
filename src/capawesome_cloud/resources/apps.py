@@ -116,16 +116,22 @@ class AppsResource(BaseResource):
         type: Union[str, NotGiven] = NOT_GIVEN,
         app_channel_id: Union[str, None, NotGiven] = NOT_GIVEN,
         app_environment_id: Union[str, None, NotGiven] = NOT_GIVEN,
+        build_stack: Union[str, None, NotGiven] = NOT_GIVEN,
         app_channel_discovery_enabled: Union[bool, NotGiven] = NOT_GIVEN,
         next_app_build_number: Union[int, NotGiven] = NOT_GIVEN,
     ) -> App:
-        """Update an app."""
+        """Update an app.
+
+        ``build_stack`` is the default stack for builds that do not specify one. Pass
+        ``None`` to use the Capawesome Cloud default.
+        """
         body = build_body(
             {
                 "name": name,
                 "type": type,
                 "appChannelId": app_channel_id,
                 "appEnvironmentId": app_environment_id,
+                "buildStack": build_stack,
                 "appChannelDiscoveryEnabled": app_channel_discovery_enabled,
                 "nextAppBuildNumber": next_app_build_number,
             }
