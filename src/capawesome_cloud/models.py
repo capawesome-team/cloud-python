@@ -71,6 +71,7 @@ class CapawesomeModel(BaseModel):
 class App(CapawesomeModel):
     name: Optional[str] = None
     type: Optional[str] = None
+    build_stack: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
