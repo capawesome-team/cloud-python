@@ -99,3 +99,12 @@ def test_list_git_repositories(client: CapawesomeCloud) -> None:
     )
     assert route.calls.last.request.url.params["namespace"] == "owner"
     assert repositories[0].path == "owner/name"
+
+
+@respx.mock
+def test_string_is_not_split_into_characters(client: CapawesomeCloud) -> None:
+    route = respx.post(f"{ORG_URL}/license-keys").mock(
+        return_value=httpx.Response(201, json={"id": "lk1"})
+    )
+    client.organizations.license_keys.create("org1", name="CI", package_ids="p1")
+    assert route.calls.last.request.read() == b'{"name":"CI","packageIds":"p1"}'

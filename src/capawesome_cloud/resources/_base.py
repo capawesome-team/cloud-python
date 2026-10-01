@@ -27,8 +27,12 @@ def build_params(values: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def to_list(values: object) -> object:
-    """Convert a sequence to a JSON-serializable list, passing sentinels through."""
-    if isinstance(values, Sequence):
+    """Convert a sequence to a JSON-serializable list, passing sentinels through.
+
+    Strings are passed through as well, so the API rejects them instead of
+    receiving a list of characters.
+    """
+    if isinstance(values, Sequence) and not isinstance(values, str):
         return list(values)
     return values
 
