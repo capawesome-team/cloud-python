@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
-from .._types import NotGiven
+from .._types import NOT_GIVEN, NotGiven
 from ..models import AppDestination
 from ..pagination import DEFAULT_PAGE_SIZE, Paginator
-from ._base import BaseResource, build_params
+from ._base import BaseResource, build_body, build_params
 
 # Fields shared by create and update.
 _WRITE_FIELDS = {
@@ -25,6 +25,16 @@ _WRITE_FIELDS = {
     "apple_app_password": "appleAppPassword",
     "apple_app_id": "appleAppId",
     "apple_team_id": "appleTeamId",
+    "apple_beta_groups": "appleBetaGroups",
+    "apple_reject_if_possible": "appleRejectIfPossible",
+    "apple_release_type": "appleReleaseType",
+    "apple_submit_for_review": "appleSubmitForReview",
+    "firebase_app_id": "firebaseAppId",
+    "firebase_tester_groups": "firebaseTesterGroups",
+    "huawei_app_id": "huaweiAppId",
+    "huawei_client_id": "huaweiClientId",
+    "huawei_client_secret": "huaweiClientSecret",
+    "default_language": "defaultLanguage",
 }
 
 
@@ -32,14 +42,24 @@ class DestinationsResource(BaseResource):
     def _base(self, app_id: str) -> str:
         return f"/v1/apps/{app_id}/destinations"
 
-    def create(self, app_id: str, *, name: str, **fields: object) -> AppDestination:
+    def create(
+        self,
+        app_id: str,
+        *,
+        name: str,
+        type: Union[str, NotGiven] = NOT_GIVEN,
+        **fields: object,
+    ) -> AppDestination:
         """Create a destination.
 
-        ``name`` is required. Provide further fields by their snake_case names,
-        e.g. ``platform``, ``android_package_name``, ``apple_app_id``,
-        ``google_play_track`` (see the API reference for the full list).
+        ``name`` is required. ``type`` is one of ``apple-app-store-connect``,
+        ``firebase-app-distribution``, ``google-play``, ``huawei-appgallery`` and
+        cannot be changed afterwards. Provide further fields by their snake_case
+        names, e.g. ``platform``, ``android_package_name``, ``apple_app_id``,
+        ``apple_submit_for_review``, ``firebase_tester_groups``, ``huawei_app_id``
+        or ``default_language`` (see the API reference for the full list).
         """
-        body = _map_write_fields({"name": name, **fields})
+        body = build_body({"type": type, **_map_write_fields({"name": name, **fields})})
         return self._request_model("POST", self._base(app_id), AppDestination, json=body)
 
     def list(
@@ -100,9 +120,26 @@ class DestinationsResource(BaseResource):
             "PATCH", f"{self._base(app_id)}/{destination_id}", AppDestination, json=body
         )
 
-    def delete(self, app_id: str, destination_id: str) -> None:
-        """Delete a destination."""
-        self._request_none("DELETE", f"{self._base(app_id)}/{destination_id}")
+    def delete(
+        self,
+        app_id: str,
+        destination_id: Optional[str] = None,
+        *,
+        name: Optional[str] = None,
+        platform: Optional[str] = None,
+    ) -> None:
+        """Delete a destination by id or name. The id takes precedence.
+
+        Names are only unique per platform, so pass ``platform`` along with
+        ``name``. It is ignored when deleting by id.
+        """
+        self._delete_by_id_or_name(
+            self._base(app_id),
+            id=destination_id,
+            name=name,
+            resource="destination",
+            params={"platform": platform},
+        )
 
 
 def _map_write_fields(fields: dict[str, object]) -> dict[str, object]:

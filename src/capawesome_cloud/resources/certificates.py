@@ -137,9 +137,27 @@ class CertificatesResource(BaseResource):
             "PATCH", f"{self._base(app_id)}/{certificate_id}", AppCertificate, json=body
         )
 
-    def delete(self, app_id: str, certificate_id: str) -> None:
-        """Delete a certificate."""
-        self._request_none("DELETE", f"{self._base(app_id)}/{certificate_id}")
+    def delete(
+        self,
+        app_id: str,
+        certificate_id: Optional[str] = None,
+        *,
+        name: Optional[str] = None,
+        platform: Optional[str] = None,
+        type: Optional[str] = None,
+    ) -> None:
+        """Delete a certificate by id or name. The id takes precedence.
+
+        Names are only unique per platform and type, so pass ``platform`` and
+        ``type`` along with ``name``. Both are ignored when deleting by id.
+        """
+        self._delete_by_id_or_name(
+            self._base(app_id),
+            id=certificate_id,
+            name=name,
+            resource="certificate",
+            params={"platform": platform, "type": type},
+        )
 
 
 def _read_file(file: FileSource, file_name: Optional[str]) -> tuple[bytes, str]:

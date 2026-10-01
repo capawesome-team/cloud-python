@@ -58,6 +58,28 @@ class BaseResource:
     ) -> None:
         self._http.request(method, path, params=params, json=json)
 
+    def _delete_by_id_or_name(
+        self,
+        collection_path: str,
+        *,
+        id: Optional[str],
+        name: Optional[str],
+        resource: str,
+        params: Optional[Mapping[str, Any]] = None,
+    ) -> None:
+        """Delete by id, or by unique name if no id is given.
+
+        ``params`` narrow down a name-based delete and are ignored for ids.
+        """
+        if id:
+            self._request_none("DELETE", f"{collection_path}/{id}")
+        elif name:
+            self._request_none(
+                "DELETE", collection_path, params=build_params({**(params or {}), "name": name})
+            )
+        else:
+            raise ValueError(f"Either an id or a name is required to delete a {resource}.")
+
     # -- collections --------------------------------------------------------
 
     def _list_page(

@@ -14,10 +14,12 @@ from .build_sources import BuildSourcesResource
 from .builds import BuildsResource
 from .certificates import CertificatesResource
 from .channels import ChannelsResource
+from .configurations import ConfigurationsResource
 from .deployments import DeploymentsResource
 from .destinations import DestinationsResource
 from .devices import DevicesResource
 from .environments import EnvironmentsResource
+from .repository import RepositoryResource
 from .webhooks import WebhooksResource
 
 
@@ -43,6 +45,8 @@ class AppsResource(BaseResource):
         self.certificates = CertificatesResource(http)
         self.webhooks = WebhooksResource(http)
         self.automations = AutomationsResource(http)
+        self.configurations = ConfigurationsResource(http)
+        self.repository = RepositoryResource(http)
 
     def create(
         self,
@@ -60,13 +64,19 @@ class AppsResource(BaseResource):
         self,
         *,
         organization_id: Optional[str] = None,
+        name: Optional[str] = None,
         query: Optional[str] = None,
         relations: Optional[str] = None,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> Paginator[App]:
         """Iterate over all apps, transparently paging through the result set."""
         params = build_params(
-            {"organizationId": organization_id, "query": query, "relations": relations}
+            {
+                "organizationId": organization_id,
+                "name": name,
+                "query": query,
+                "relations": relations,
+            }
         )
         return self._paginate(self._path, App, params=params, page_size=page_size)
 
@@ -76,6 +86,7 @@ class AppsResource(BaseResource):
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         organization_id: Optional[str] = None,
+        name: Optional[str] = None,
         query: Optional[str] = None,
         relations: Optional[str] = None,
     ) -> List[App]:
@@ -85,6 +96,7 @@ class AppsResource(BaseResource):
                 "limit": limit,
                 "offset": offset,
                 "organizationId": organization_id,
+                "name": name,
                 "query": query,
                 "relations": relations,
             }

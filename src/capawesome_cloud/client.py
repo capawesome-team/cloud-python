@@ -15,7 +15,7 @@ from ._http import (
     HttpClient,
 )
 from .exceptions import CapawesomeCloudError
-from .resources import AppsResource, JobsResource
+from .resources import AppsResource, JobsResource, UsersResource
 
 # Token environment variables, in order of precedence. CAPAWESOME_TOKEN is
 # accepted for consistency with the Capawesome CLI.
@@ -76,6 +76,7 @@ class CapawesomeCloud:
         # ``client.apps.channels``); ``jobs`` is organization-scoped.
         self.apps = AppsResource(self._http)
         self.jobs = JobsResource(self._http)
+        self.users = UsersResource(self._http)
 
     def close(self) -> None:
         """Close the underlying HTTP connection pool."""

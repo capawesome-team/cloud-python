@@ -37,7 +37,11 @@ __all__ = [
     "AppCertificate",
     "AppWebhook",
     "AppAutomation",
+    "AppConfiguration",
+    "AppGitRepository",
     "Job",
+    "JobFailureSummary",
+    "User",
 ]
 
 
@@ -83,6 +87,7 @@ class AppBuild(CapawesomeModel):
 class AppBuildArtifact(CapawesomeModel):
     type: Optional[str] = None
     status: Optional[str] = None
+    form_factor: Optional[str] = None
     app_build_id: Optional[str] = None
     total_size_in_bytes: Optional[int] = None
     download_url: Optional[str] = None
@@ -104,6 +109,7 @@ class AppDeployment(CapawesomeModel):
     app_id: Optional[str] = None
     job_id: Optional[str] = None
     rollout_percentage: Optional[float] = None
+    release_notes: Optional[dict[str, str]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -111,6 +117,7 @@ class AppDeployment(CapawesomeModel):
 class AppDestination(CapawesomeModel):
     name: Optional[str] = None
     platform: Optional[str] = None
+    type: Optional[str] = None
     app_id: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -181,6 +188,26 @@ class AppAutomation(CapawesomeModel):
     updated_at: Optional[datetime] = None
 
 
+class AppConfiguration(CapawesomeModel):
+    name: Optional[str] = None
+    display_name: Optional[str] = None
+    package_name: Optional[str] = None
+    app_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class AppGitRepository(CapawesomeModel):
+    name: Optional[str] = None
+    path: Optional[str] = None
+    provider: Optional[str] = None
+    web_url: Optional[str] = None
+    app_id: Optional[str] = None
+    git_connection_id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
 class Job(CapawesomeModel):
     status: Optional[str] = None
     app_id: Optional[str] = None
@@ -188,3 +215,14 @@ class Job(CapawesomeModel):
     app_deployment_id: Optional[str] = None
     finished_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
+
+
+class JobFailureSummary(CapawesomeModel):
+    summary: Optional[str] = None
+
+
+class User(CapawesomeModel):
+    email: Optional[str] = None
+    name: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

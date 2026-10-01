@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Mapping, Optional, Union
+from typing import Any, List, Mapping, Optional, Sequence, Union
 
 from .._http import HttpClient
 from .._types import NOT_GIVEN, NotGiven
@@ -31,12 +31,23 @@ class BuildsResource(BaseResource):
         app_certificate_id: Union[str, None, NotGiven] = NOT_GIVEN,
         app_certificate_name: Union[str, None, NotGiven] = NOT_GIVEN,
         app_channel_id: Union[str, None, NotGiven] = NOT_GIVEN,
+        app_channel_ids: Union[Sequence[str], None, NotGiven] = NOT_GIVEN,
+        app_channel_names: Union[Sequence[str], None, NotGiven] = NOT_GIVEN,
+        app_configuration_id: Union[str, None, NotGiven] = NOT_GIVEN,
+        app_configuration_name: Union[str, None, NotGiven] = NOT_GIVEN,
         app_destination_id: Union[str, None, NotGiven] = NOT_GIVEN,
         app_environment_id: Union[str, None, NotGiven] = NOT_GIVEN,
         app_environment_name: Union[str, None, NotGiven] = NOT_GIVEN,
         ad_hoc_environment_variables: Union[Mapping[str, str], None, NotGiven] = NOT_GIVEN,
+        release_notes: Union[Mapping[str, str], NotGiven] = NOT_GIVEN,
     ) -> AppBuild:
-        """Trigger a native build. Returns the build (poll its ``job_id`` for progress)."""
+        """Trigger a native build. Returns the build (poll its ``job_id`` for progress).
+
+        Web builds are deployed to the channels in ``app_channel_ids`` (or
+        ``app_channel_names``) after they succeed; ``app_channel_id`` is deprecated.
+        ``release_notes`` are only supported together with ``app_destination_id``
+        (see :meth:`DeploymentsResource.create`).
+        """
         body = build_body(
             {
                 "platform": platform,
@@ -47,10 +58,15 @@ class BuildsResource(BaseResource):
                 "appCertificateId": app_certificate_id,
                 "appCertificateName": app_certificate_name,
                 "appChannelId": app_channel_id,
+                "appChannelIds": _to_list(app_channel_ids),
+                "appChannelNames": _to_list(app_channel_names),
+                "appConfigurationId": app_configuration_id,
+                "appConfigurationName": app_configuration_name,
                 "appDestinationId": app_destination_id,
                 "appEnvironmentId": app_environment_id,
                 "appEnvironmentName": app_environment_name,
                 "adHocEnvironmentVariables": ad_hoc_environment_variables,
+                "releaseNotes": release_notes,
             }
         )
         return self._request_model("POST", self._base(app_id), AppBuild, json=body)
@@ -193,3 +209,9 @@ class BuildArtifactsResource(BaseResource):
         return self._download(
             f"{self._base(app_id, build_id)}/{artifact_id}/download", params=params
         )
+
+
+def _to_list(values: object) -> object:
+    if isinstance(values, Sequence):
+        return list(values)
+    return values
