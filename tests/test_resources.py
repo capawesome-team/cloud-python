@@ -127,6 +127,29 @@ def test_build_sends_channel_ids_as_list(client: CapawesomeCloud) -> None:
 
 
 @respx.mock
+def test_automation_create_sends_channel_ids_and_parses(client: CapawesomeCloud) -> None:
+    route = respx.post(f"{BASE_URL}/v1/apps/app1/automations").mock(
+        return_value=httpx.Response(201, json={"id": "a1", "appChannelIds": ["ch1", "ch2"]})
+    )
+    automation = client.apps.automations.create(
+        "app1", name="Web", trigger_type="branch", app_channel_ids=["ch1", "ch2"]
+    )
+    assert route.calls.last.request.read() == (
+        b'{"name":"Web","triggerType":"branch","appChannelIds":["ch1","ch2"]}'
+    )
+    assert automation.app_channel_ids == ["ch1", "ch2"]
+
+
+@respx.mock
+def test_automation_update_clears_channels_with_empty_list(client: CapawesomeCloud) -> None:
+    route = respx.patch(f"{BASE_URL}/v1/apps/app1/automations/a1").mock(
+        return_value=httpx.Response(200, json={"id": "a1", "appChannelIds": []})
+    )
+    client.apps.automations.update("app1", "a1", app_channel_ids=[])
+    assert route.calls.last.request.read() == b'{"appChannelIds":[]}'
+
+
+@respx.mock
 def test_destination_create_sends_type_and_new_fields(client: CapawesomeCloud) -> None:
     route = respx.post(f"{BASE_URL}/v1/apps/app1/destinations").mock(
         return_value=httpx.Response(201, json={"id": "d1", "type": "apple-app-store-connect"})
