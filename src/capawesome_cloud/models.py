@@ -195,6 +195,7 @@ class AppAutomation(CapawesomeModel):
     platform: Optional[str] = None
     trigger_type: Optional[str] = None
     enabled: Optional[bool] = None
+    app_channel_ids: Optional[list[str]] = None
     app_id: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

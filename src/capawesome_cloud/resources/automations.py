@@ -21,7 +21,9 @@ _WRITE_FIELDS = {
     "app_certificate_id": "appCertificateId",
     "app_certificate_name": "appCertificateName",
     "app_channel_id": "appChannelId",
+    "app_channel_ids": "appChannelIds",
     "app_channel_name": "appChannelName",
+    "app_channel_names": "appChannelNames",
     "app_configuration_id": "appConfigurationId",
     "app_configuration_name": "appConfigurationName",
     "app_destination_id": "appDestinationId",
@@ -42,8 +44,12 @@ class AutomationsResource(BaseResource):
 
         ``name`` and ``trigger_type`` (``branch`` or ``tag``) are required. Provide
         further fields by their snake_case names (e.g. ``platform``,
-        ``trigger_pattern``, ``app_channel_id``). Resources can also be referenced
-        by name (e.g. ``app_channel_name``); ids take precedence.
+        ``trigger_pattern``, ``app_channel_ids``). Resources can also be referenced
+        by name (e.g. ``app_channel_names``); ids take precedence.
+
+        Web builds are deployed to the channels in ``app_channel_ids`` (or
+        ``app_channel_names``) after they succeed; ``app_channel_id`` and
+        ``app_channel_name`` are deprecated.
         """
         body = _map_write_fields({"name": name, "trigger_type": trigger_type, **fields})
         return self._request_model("POST", self._base(app_id), AppAutomation, json=body)
@@ -98,7 +104,10 @@ class AutomationsResource(BaseResource):
         )
 
     def update(self, app_id: str, automation_id: str, **fields: object) -> AppAutomation:
-        """Update an automation. Provide fields by their snake_case names."""
+        """Update an automation. Provide fields by their snake_case names.
+
+        Omitted fields stay unchanged; pass ``app_channel_ids=[]`` to remove all channels.
+        """
         body = _map_write_fields(fields)
         return self._request_model(
             "PATCH", f"{self._base(app_id)}/{automation_id}", AppAutomation, json=body
