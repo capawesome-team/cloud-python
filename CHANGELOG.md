@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/capawesome-team/cloud-python/compare/v0.2.1...v0.2.2) (2026-10-04)
+
+
+### Features
+
+* **automations:** support multiple channels ([#10](https://github.com/capawesome-team/cloud-python/issues/10)) ([2448cea](https://github.com/capawesome-team/cloud-python/commit/2448cea1ad1fd74a7cab8aaf83cfdd95da11a297))
+
 ## [0.2.1](https://github.com/capawesome-team/cloud-python/compare/v0.2.0...v0.2.1) (2026-10-01)
 
 
