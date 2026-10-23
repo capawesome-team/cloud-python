@@ -4,7 +4,7 @@ Runnable scripts to try the SDK against the live Capawesome Cloud API.
 
 ## Prerequisites
 
-- Python 3.9 or later
+- Python 3.10 or later
 - The SDK installed — from the repository root run `pip install -e .` (or `pip install capawesome-cloud`)
 - An API token from the [Capawesome Cloud Console](https://console.cloud.capawesome.io/settings/tokens)
 

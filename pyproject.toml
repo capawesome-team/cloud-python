@@ -7,7 +7,7 @@ name = "capawesome-cloud"
 dynamic = ["version"]
 description = "Python SDK for the Capawesome Cloud API"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 authors = [{ name = "Capawesome Team", email = "support@capawesome.io" }]
 keywords = ["capawesome", "capacitor", "live-updates", "sdk", "api"]
@@ -18,7 +18,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -53,20 +52,18 @@ packages = ["src/capawesome_cloud"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+target-version = "py310"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "W", "N", "C4", "SIM"]
-# UP007/UP035/UP045 push 3.10+ syntax (X | None, collections.abc generics) that
-# breaks pydantic annotation evaluation on Python 3.9, which we still support.
+# TODO: Enable UP006/UP007/UP035/UP045 (PEP 585/604 syntax) now that Python 3.9 is no longer supported.
 ignore = ["E501", "UP006", "UP007", "UP035", "UP045"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["capawesome_cloud"]
 
 [tool.mypy]
-# Analysis target; the runtime code remains compatible down to Python 3.9.
 python_version = "3.10"
 strict = true
 warn_unused_ignores = true

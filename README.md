@@ -25,7 +25,7 @@ Official SDKs for the Capawesome Cloud API:
 pip install capawesome-cloud
 ```
 
-**Requirements:** Python 3.9 or later.
+**Requirements:** Python 3.10 or later.
 
 ## Getting started
 
