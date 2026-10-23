@@ -4,7 +4,14 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 ## Versions
 
+- [Version 0.3.x](#version-03x)
 - [Version 0.2.x](#version-02x)
+
+## Version 0.3.x
+
+### Python 3.10 Required
+
+Support for Python 3.9 has been removed, as it reached end of life in October 2025. Python 3.10 or later is now required.
 
 ## Version 0.2.x
 
