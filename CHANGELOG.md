@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/capawesome-team/cloud-python/compare/v0.2.2...v0.3.0) (2026-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop support for Python 3.9 ([#13](https://github.com/capawesome-team/cloud-python/issues/13))
+
+### Miscellaneous Chores
+
+* drop support for Python 3.9 ([#13](https://github.com/capawesome-team/cloud-python/issues/13)) ([8268978](https://github.com/capawesome-team/cloud-python/commit/826897867a9c4a270cebb6c1352a8550f6da5db7))
+
 ## [0.2.2](https://github.com/capawesome-team/cloud-python/compare/v0.2.1...v0.2.2) (2026-10-04)
 
 
