@@ -62,9 +62,10 @@ class HttpClient:
             base_url=base_url.rstrip("/"),
             timeout=timeout,
         )
-        # The token must always apply; identify ourselves on clients we create
-        # without clobbering a caller-supplied client's User-Agent.
+        # The token and the client header must always apply. The User-Agent is
+        # set only on clients we create, so a caller-supplied one keeps its own.
         self._client.headers["Authorization"] = f"Bearer {token}"
+        self._client.headers["X-Capawesome-Client"] = f"cloud-python/{__version__}"
         self._client.headers.setdefault("Accept", "application/json")
         if self._owns_client:
             self._client.headers["User-Agent"] = f"capawesome-cloud-python/{__version__}"

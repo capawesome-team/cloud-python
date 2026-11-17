@@ -3,7 +3,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from capawesome_cloud import CapawesomeCloud, CapawesomeCloudError
+from capawesome_cloud import CapawesomeCloud, CapawesomeCloudError, __version__
 
 
 def test_token_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -41,11 +41,12 @@ def test_missing_token_raises(monkeypatch: pytest.MonkeyPatch) -> None:
         CapawesomeCloud(token="   ")
 
 
-def test_sets_auth_and_user_agent_headers() -> None:
+def test_sets_auth_and_client_headers() -> None:
     client = CapawesomeCloud(token="abc")
     headers = client._http._client.headers
     assert headers["Authorization"] == "Bearer abc"
-    assert headers["User-Agent"].startswith("capawesome-cloud-python/")
+    assert headers["User-Agent"] == f"capawesome-cloud-python/{__version__}"
+    assert headers["X-Capawesome-Client"] == f"cloud-python/{__version__}"
 
 
 def test_context_manager_closes() -> None:
