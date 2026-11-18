@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/capawesome-team/cloud-python/compare/v0.3.0...v0.3.1) (2026-11-18)
+
+
+### Features
+
+* send the X-Capawesome-Client header ([#16](https://github.com/capawesome-team/cloud-python/issues/16)) ([e0fbfc4](https://github.com/capawesome-team/cloud-python/commit/e0fbfc416322614850ee5fc1ec9f9f40ee005165))
+
 ## [0.3.0](https://github.com/capawesome-team/cloud-python/compare/v0.2.2...v0.3.0) (2026-10-23)
 
 
