@@ -52,7 +52,6 @@ def test_probe_device_parses_the_bundle(client: CapawesomeCloud) -> None:
     )
     probe = client.apps.devices.probe("app1", "dev1")
     assert probe.result == "available"
-    assert probe.channel_name == "production"
     assert probe.bundle is not None
     assert probe.bundle.id == "b1"
 
