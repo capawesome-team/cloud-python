@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/capawesome-team/cloud-python/compare/v0.3.1...v0.3.2) (2026-11-23)
+
+
+### Features
+
+* **devices:** add probe ([#18](https://github.com/capawesome-team/cloud-python/issues/18)) ([3917bb5](https://github.com/capawesome-team/cloud-python/commit/3917bb5d4e3e24b29b24d9fca0b768382911a155))
+
 ## [0.3.1](https://github.com/capawesome-team/cloud-python/compare/v0.3.0...v0.3.1) (2026-11-18)
 
 
