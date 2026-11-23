@@ -31,6 +31,7 @@ __all__ = [
     "AppDeployment",
     "AppDestination",
     "AppDevice",
+    "AppDeviceProbe",
     "AppEnvironment",
     "AppEnvironmentVariable",
     "AppEnvironmentSecret",
@@ -145,6 +146,19 @@ class AppDevice(CapawesomeModel):
     last_seen_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
+class AppDeviceProbe(CapawesomeModel):
+    """What a device would get from an update check.
+
+    ``result`` is ``available``, ``up_to_date`` or ``skipped``. ``bundle`` is set
+    only when an update is available, ``reason`` only when the check is skipped.
+    """
+
+    bundle: Optional[CapawesomeModel] = None
+    channel_name: Optional[str] = None
+    reason: Optional[str] = None
+    result: Optional[str] = None
 
 
 class AppEnvironment(CapawesomeModel):

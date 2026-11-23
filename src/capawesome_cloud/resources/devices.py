@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import List, Optional, Union
 
 from .._types import NOT_GIVEN, NotGiven
-from ..models import AppDevice
+from ..models import AppDevice, AppDeviceProbe
 from ..pagination import DEFAULT_PAGE_SIZE, Paginator
 from ._base import BaseResource, build_body, build_params
 
@@ -66,3 +66,7 @@ class DevicesResource(BaseResource):
     def delete(self, app_id: str, device_id: str) -> None:
         """Delete a device."""
         self._request_none("DELETE", f"{self._base(app_id)}/{device_id}")
+
+    def probe(self, app_id: str, device_id: str) -> AppDeviceProbe:
+        """Probe what a device would get from an update check. Nothing is recorded."""
+        return self._request_model("GET", f"{self._base(app_id)}/{device_id}/probe", AppDeviceProbe)

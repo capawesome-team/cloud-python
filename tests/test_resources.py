@@ -40,6 +40,23 @@ def test_update_with_no_args_sends_empty_body(client: CapawesomeCloud) -> None:
 
 
 @respx.mock
+def test_probe_device_parses_the_bundle(client: CapawesomeCloud) -> None:
+    probe_json = {
+        "bundle": {"id": "b1"},
+        "channelName": "production",
+        "reason": None,
+        "result": "available",
+    }
+    respx.get(f"{BASE_URL}/v1/apps/app1/devices/dev1/probe").mock(
+        return_value=httpx.Response(200, json=probe_json)
+    )
+    probe = client.apps.devices.probe("app1", "dev1")
+    assert probe.result == "available"
+    assert probe.bundle is not None
+    assert probe.bundle.id == "b1"
+
+
+@respx.mock
 def test_app_update_sends_build_stack(client: CapawesomeCloud) -> None:
     route = respx.patch(f"{BASE_URL}/v1/apps/app1").mock(
         return_value=httpx.Response(200, json={"id": "app1", "buildStack": "macos-tahoe"})
